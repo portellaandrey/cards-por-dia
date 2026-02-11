@@ -21,28 +21,31 @@ def home():
 
 @app.route("/cards-por-dia")
 def cards_por_dia():
-    url = f"https://api.trello.com/1/boards/{BOARD_ID}/cards"
+    url = f"https://api.trello.com/1/boards/{BOARD_ID}/cards?filter=open"
     params = {
         "key": API_KEY,
         "token": TOKEN
     }
 
-    response = requests.get(url, params=params)
-    cards = response.json()
+    try:
+        response = requests.get(url, params=params)
+        response.raise_for_status()
+        cards = response.json()
 
-    datas = []
+        datas = []
+        for card in cards:
+            card_id = card["id"]
+            timestamp = int(card_id[:8], 16)
+            data = datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d")
+            datas.append(data)
 
-    for card in cards:
-        card_id = card["id"]
-        timestamp = int(card_id[:8], 16)
-        data = datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d")
-        datas.append(data)
+        contagem = dict(sorted(Counter(datas).items()))
 
-    contagem = Counter(datas)
+        return jsonify(contagem)
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
-    return jsonify(contagem)
-
-  # CERTO
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8080)) # Dê um TAB ou 4 espaços aqui
-    app.run(host='0.0.0.0', port=port)       # E aqui também
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host='0.0.0.0', port=port)
