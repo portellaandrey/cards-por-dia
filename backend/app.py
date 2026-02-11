@@ -42,7 +42,7 @@ def cards_por_dia():
 
     return jsonify(contagem)
 
-    if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
-
+  # CERTO
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000)) # Dê um TAB ou 4 espaços aqui
+    app.run(host='0.0.0.0', port=port)       # E aqui também
