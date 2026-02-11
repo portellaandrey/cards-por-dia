@@ -44,5 +44,5 @@ def cards_por_dia():
 
   # CERTO
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000)) # Dê um TAB ou 4 espaços aqui
+    port = int(os.environ.get("PORT", 8080)) # Dê um TAB ou 4 espaços aqui
     app.run(host='0.0.0.0', port=port)       # E aqui também
