@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Trello Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+    }
+
+    body {
+        background: #0f172a;
+        color: #e2e8f0;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        min-height: 100vh;
+    }
+
+    .container {
+        width: 90%;
+        max-width: 1100px;
+        margin-top: 40px;
+    }
+
+    .header {
+        margin-bottom: 25px;
+    }
+
+    .header h1 {
+        font-size: 28px;
+        font-weight: 600;
+    }
+
+    .header p {
+        color: #94a3b8;
+        margin-top: 5px;
+    }
+
+    .cards {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+    }
+
+    .card {
+        background: #1e293b;
+        padding: 20px;
+        border-radius: 12px;
+        min-width: 200px;
+        flex: 1;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .card h3 {
+        font-size: 14px;
+        color: #94a3b8;
+        margin-bottom: 8px;
+    }
+
+    .card .value {
+        font-size: 28px;
+        font-weight: bold;
+        color: #38bdf8;
+    }
+
+    .chart-container {
+        background: #1e293b;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    canvas {
+        width: 100% !important;
+        height: 400px !important;
+    }
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+<div class="header">
+    <h1>Dashboard Trello full stack</h1>
+    <p>Monitoramento de cards criados por dia</p>
+</div>
+
+<div class="cards">
+    <div class="card">
+        <h3>Total de Cards</h3>
+        <div class="value" id="totalCards">0</div>
+    </div>
+
+    <div class="card">
+        <h3>Média por dia</h3>
+        <div class="value" id="mediaCards">0</div>
+    </div>
+</div>
+
+<div class="chart-container">
+    <canvas id="grafico"></canvas>
+</div>
+
+</div>
+
+<script>
+fetch("http://127.0.0.1:5000/cards-por-dia")
+    .then(response => response.json())
+    .then(data => {
+
+        const datas = Object.keys(data);
+        const valores = Object.values(data);
+
+        const total = valores.reduce((a, b) => a + b, 0);
+        const media = (total / valores.length).toFixed(1);
+
+        document.getElementById("totalCards").innerText = total;
+        document.getElementById("mediaCards").innerText = media;
+
+        const ctx = document.getElementById("grafico").getContext("2d");
+
+        new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: datas,
+                datasets: [{
+                    label: "Cards por dia",
+                    data: valores,
+                    backgroundColor: "#38bdf8",
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: "#e2e8f0"
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            color: "#94a3b8"
+                        },
+                        grid: {
+                            color: "rgba(148,163,184,0.1)"
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            color: "#94a3b8"
+                        },
+                        grid: {
+                            color: "rgba(148,163,184,0.1)"
+                        }
+                    }
+                }
+            }
+        });
+
+    })
+    .catch(error => console.error("Erro:", error));
+</script>
+
+</body>
+</html>
